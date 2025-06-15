@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UserHeader from '../components/UserHeader';
 import UserFooter from '../components/UserFooter';
 
 const UserProfile = () => {
-  const [user, setUser] = useState({
-    nama: "Rifqi Yusufi",
-    email: "rifqi@example.com",
-    alamat: "Jalan Mawar No. 12, Bandung",
-    telepon: "08123456789"
-  });
-
+  const [user, setUser] = useState(null);
+  const [formData, setFormData] = useState({ nama: '', email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
@@ -45,14 +41,32 @@ const UserProfile = () => {
     }
   ];
 
-  const [formData, setFormData] = useState(user);
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      setUser(storedUser);
+      setFormData({
+        nama: storedUser.name || '',
+        email: storedUser.email || '',
+        password: storedUser.password || ''
+      });
+    }
+  }, []);
 
   const handleInputChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSave = () => {
-    setUser(formData);
+    const updatedUser = {
+      ...user,
+      name: formData.nama,
+      email: formData.email,
+      password: formData.password
+    };
+
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
     setShowModal(false);
   };
 
@@ -60,6 +74,8 @@ const UserProfile = () => {
     setSelectedTransaction(trx);
     setShowDetailModal(true);
   };
+
+  if (!user) return <div className="text-center mt-5">Memuat data pengguna...</div>;
 
   return (
     <div>
@@ -85,15 +101,27 @@ const UserProfile = () => {
           <div className="col-lg-4 mb-4">
             <div className="card shadow-sm p-4">
               <h4 className="orange-text mb-3">Data Diri</h4>
-              <p><strong>Nama:</strong> {user.nama}</p>
+              <p><strong>Nama:</strong> {user.name}</p>
               <p><strong>Email:</strong> {user.email}</p>
-              <p><strong>Alamat:</strong> {user.alamat}</p>
-              <p><strong>Telepon:</strong> {user.telepon}</p>
+              <div className="d-flex align-items-center justify-content-between">
+                <p className="mb-0">
+                  <strong>Password:</strong>{' '}
+                  {showPassword ? user.password : '••••••••'}
+                </p>
+                <button
+                  className="btn btn-sm btn-outline-secondary ml-2"
+                  onClick={() => setShowPassword(!showPassword)}
+                  title={showPassword ? 'Sembunyikan Password' : 'Lihat Password'}
+                >
+                  <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                </button>
+              </div>
               <a className="boxed-btn mt-3" href="#" onClick={(e) => { e.preventDefault(); setShowModal(true); }}>
                 Edit Profil
               </a>
             </div>
           </div>
+
           <div className="col-lg-8">
             <div className="card shadow-sm p-4">
               <h4 className="orange-text mb-4">Riwayat Transaksi</h4>
@@ -155,12 +183,22 @@ const UserProfile = () => {
                     <input type="email" name="email" className="form-control" value={formData.email} onChange={handleInputChange} />
                   </div>
                   <div className="form-group">
-                    <label>Alamat</label>
-                    <textarea name="alamat" className="form-control" value={formData.alamat} onChange={handleInputChange} />
-                  </div>
-                  <div className="form-group">
-                    <label>Telepon</label>
-                    <input type="text" name="telepon" className="form-control" value={formData.telepon} onChange={handleInputChange} />
+                    <label>Password</label>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      className="form-control"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-secondary mt-2"
+                      onClick={() => setShowPassword(!showPassword)}
+                      title={showPassword ? 'Sembunyikan' : 'Lihat'}
+                    >
+                      <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                    </button>
                   </div>
                 </form>
               </div>

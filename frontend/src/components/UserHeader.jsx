@@ -1,6 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { getCurrentUser, logout } from '../utils/auth';
 
+const user = getCurrentUser();
 const UserHeader = () => {
   return (
     <div>
@@ -41,15 +43,26 @@ const UserHeader = () => {
                         <Link className="mobile-hide search-bar-icon" to="#">
                           <i className="fas fa-search"></i>
                         </Link>                      
-                        <Link to="/login" className="boxed-btn">
-                          Login
-                        </Link>
+                        {user ? (
+                          <>
+                            <Link to="/profile" className="boxed-btn">Profil</Link>
+                            <Link
+                              to="/"
+                              className="boxed-btn ml-2"
+                              onClick={() => {
+                                logout();
+                              }}
+                            >
+                              Logout
+                            </Link>
+                          </>
+                        ) : (
+                          <Link to="/login" className="boxed-btn">Login</Link>
+                        )}
                       </div>
                     </li>
-
                   </ul>
                 </nav>
-
                 <a className="mobile-show search-bar-icon" href="#"><i className="fas fa-search"></i></a>
                 <div className="mobile-menu"></div>
                 {/* Menu End */}

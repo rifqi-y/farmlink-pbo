@@ -1,12 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import AdminHeader from '../components/AdminHeader';
 import AdminSidebar from '../components/AdminSidebar';
+import { getCurrentUser, isAdmin } from '../utils/auth';
+import { useNavigate } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   LineChart, Line, Legend
 } from 'recharts';
 
 const Dashboard = () => {
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (!user) {
+      navigate('/login');
+    } else if (!isAdmin()) {
+      alert("Akses hanya untuk Admin");
+      navigate('/');
+    }
+  }, []);
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     users: 12,
     categories: 5,
