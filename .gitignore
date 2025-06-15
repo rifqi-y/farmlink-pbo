@@ -1,0 +1,13 @@
+# Dependency
+/frontend/node_modules/
+
+# Editor
+.vscode/
+
+# Build output (jika ada)
+dist/
+build/
+
+# OS-specific
+.DS_Store
+Thumbs.db
