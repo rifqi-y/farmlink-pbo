@@ -19,7 +19,7 @@ public class UserService {
         return userRepo.findAll();
     }
 
-    public Optional<UserModel> findById(Long id) {
+    public Optional<UserModel> findById(int id) {
         return userRepo.findById(id);
     }
 
@@ -27,7 +27,7 @@ public class UserService {
         return userRepo.save(user);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(int id) {
         userRepo.deleteById(id);
     }
 }

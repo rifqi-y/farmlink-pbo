@@ -24,7 +24,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public Optional<UserModel> getUser(@PathVariable Long id) {
+    public Optional<UserModel> getUser(@PathVariable int id) {
         return userService.findById(id);
     }
 
@@ -34,13 +34,18 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public UserModel updateUser(@PathVariable Long id, @RequestBody UserModel user) {
+    public UserModel updateUser(@PathVariable int id, @RequestBody UserModel user) {
         user.setId(id);
         return userService.save(user);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public void deleteUser(@PathVariable int id) {
         userService.deleteById(id);
+    }
+
+    @GetMapping("/profile/{id}")
+    public Optional<UserModel> getUserProfile(@PathVariable int id) {
+        return userService.findById(id);
     }
 }

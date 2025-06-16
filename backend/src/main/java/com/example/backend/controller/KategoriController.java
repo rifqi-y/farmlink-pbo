@@ -24,7 +24,7 @@ public class KategoriController {
     }
 
     @GetMapping("/{id}")
-    public Optional<KategoriModel> getKategoriById(@PathVariable Long id) {
+    public Optional<KategoriModel> getKategoriById(@PathVariable int id) {
         return kategoriService.getKategoriById(id);
     }
 
@@ -34,13 +34,13 @@ public class KategoriController {
     }
 
     @PutMapping("/{id}")
-    public KategoriModel updateKategori(@PathVariable Long id, @RequestBody KategoriModel kategori) {
+    public KategoriModel updateKategori(@PathVariable int id, @RequestBody KategoriModel kategori) {
         kategori.setId(id);
         return kategoriService.saveKategori(kategori);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteKategori(@PathVariable Long id) {
+    public void deleteKategori(@PathVariable int id) {
         kategoriService.deleteKategori(id);
     }
 }

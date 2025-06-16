@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.*;
 import java.util.*;
 
@@ -39,9 +40,54 @@ public class ProdukController {
         return produkService.getById(id);
     }
 
-    @PostMapping
-    public ProdukModel create(@RequestBody ProdukModel produk) {
-        validateRelasi(produk);
+    // ✅ CREATE Produk + Upload Gambar (langsung 1 proses)
+    @PostMapping("/create")
+    public ProdukModel createWithImage(
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("price") BigDecimal price,
+            @RequestParam("stock") int stock,
+            @RequestParam("categoryId") Integer categoryId,
+            @RequestParam("sellerId") Integer sellerId,
+            @RequestParam(value = "file", required = false) MultipartFile file
+    ) throws IOException {
+
+        ProdukModel produk = new ProdukModel();
+        produk.setName(name);
+        produk.setDescription(description);
+        produk.setPrice(price);
+        produk.setStock(stock);
+
+        // 🔗 Relasi kategori & user
+        KategoriModel kategori = kategoriRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Kategori tidak ditemukan"));
+        UserModel seller = userRepository.findById(sellerId)
+                .orElseThrow(() -> new RuntimeException("Seller tidak ditemukan"));
+
+        produk.setCategory(kategori);
+        produk.setSeller(seller);
+
+        // 📂 Upload file jika ada
+        if (file != null && !file.isEmpty()) {
+            String uploadDir = "uploads";
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            Path uploadPath = Paths.get(uploadDir);
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/uploads/")
+                    .path(fileName)
+                    .toUriString();
+
+            produk.setImageUrl(fileUrl);
+        }
+
         return produkService.save(produk);
     }
 
@@ -57,31 +103,6 @@ public class ProdukController {
         produkService.delete(id);
     }
 
-    // ✅ Upload Gambar
-    @PostMapping("/upload")
-    public Map<String, String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        String uploadDir = "uploads";
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        Path uploadPath = Paths.get(uploadDir);
-
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
-        Path filePath = uploadPath.resolve(fileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/uploads/")
-                .path(fileName)
-                .toUriString();
-
-        Map<String, String> response = new HashMap<>();
-        response.put("imageUrl", fileUrl);
-        return response;
-    }
-
-    // 🔒 Validasi dan set relasi kategori & user
     private void validateRelasi(ProdukModel produk) {
         if (produk.getCategory() == null || produk.getSeller() == null) {
             throw new RuntimeException("Kategori dan Seller wajib diisi");

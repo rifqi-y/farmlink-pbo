@@ -20,7 +20,7 @@ public class KategoriService {
         return kategoriRepository.findAll();
     }
 
-    public Optional<KategoriModel> getKategoriById(Long id) {
+    public Optional<KategoriModel> getKategoriById(int id) {
         return kategoriRepository.findById(id);
     }
 
@@ -28,7 +28,7 @@ public class KategoriService {
         return kategoriRepository.save(kategori);
     }
 
-    public void deleteKategori(Long id) {
+    public void deleteKategori(int id) {
         kategoriRepository.deleteById(id);
     }
 }

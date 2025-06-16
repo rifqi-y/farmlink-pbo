@@ -9,7 +9,7 @@ public class UserModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     private String name;
 
@@ -26,11 +26,11 @@ public class UserModel {
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     // Getters & Setters
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

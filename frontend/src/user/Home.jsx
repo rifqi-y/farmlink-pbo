@@ -23,15 +23,26 @@ const Home = () => {
     }
   };
 
-  const handleAddToCart = (produk) => {
+  const handleAddToCart = async (produk) => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user) {
-      navigate('/login');
+      alert('Silakan login terlebih dahulu!');
+      window.location.href = '/login';
       return;
     }
 
-    // TODO: Implementasi add to cart via API/localStorage
-    alert(`Produk ${produk.name} ditambahkan ke keranjang`);
+    try {
+      await axios.post('http://localhost:8080/api/cart', {
+        userId: user.id,
+        produkId: produk.id,
+        quantity: 1
+      });
+
+      alert('Produk berhasil ditambahkan ke keranjang!');
+    } catch (error) {
+      console.error('Gagal menambahkan ke keranjang:', error);
+      alert('Terjadi kesalahan saat menambahkan ke keranjang');
+    }
   };
   
   return (
